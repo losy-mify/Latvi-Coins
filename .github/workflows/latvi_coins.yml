@@ -52,3 +52,24 @@ jobs:
           GOST_PROXY: ${{ secrets.GOST_PROXY }}
         run: |
           python latvi_coins.py
+
+      - name: 💾 保存状态回私库
+        if: always()  # 确保即使前面脚本报错，也能保存状态文件
+        run: |
+          cd private
+          # 配置 git 机器人信息
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          
+          # 仅添加 json 状态文件
+          git add lv_state_*.json
+          
+          # 检查是否有文件变动，如果有则 commit 并 push
+          if ! git diff --staged --quiet; then
+            # 加上 [skip ci] 防止 push 触发新的 Action 循环
+            git commit -m "chore: 自动更新设备标识状态文件 [skip ci]"
+            git push
+            echo "✅ 状态文件已成功推送到私有仓库"
+          else
+            echo "ℹ️ 状态文件无变化，无需推送"
+          fi
