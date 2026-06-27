@@ -18,8 +18,8 @@ jobs:
           token: ${{ secrets.PRIVATE_REPO_TOKEN }}
           path: private
           
-      - name: 📂 移动脚本到工作目录
-        run: mv private/latvi_coins.py latvi_coins.py
+      - name: 📂 复制脚本到工作目录
+        run: cp private/latvi_coins.py latvi_coins.py
         
       - name: 🐍 设置 Python
         uses: actions/setup-python@v4
@@ -40,6 +40,7 @@ jobs:
           sleep 3
           echo "✅ GOST 已启动，测试连通性..."
           curl -s -x http://127.0.0.1:8080 https://api.ipify.org | sed 's/\([0-9]*\.[0-9]*\.\)[0-9]*\.[0-9]*/\1**.**/g'
+          echo ""
      
       - name: 🐍 安装 Python 依赖
         run: |
@@ -55,20 +56,21 @@ jobs:
         run: |
           python latvi_coins.py
   
-      - name: 💾 保存状态回私库
+      - name: 📤 推回私库
         if: always()
         env:
-          GH_TOKEN: ${{ secrets.PRIVATE_REPO_TOKEN }}
+          PRIVATE_REPO_TOKEN: ${{ secrets.PRIVATE_REPO_TOKEN }}
         run: |
+          # 关键步骤：把更新了硬编码 Cookie 的脚本覆盖回 private 文件夹
+          cp latvi_coins.py private/latvi_coins.py
           cd private
-          git config --local user.name "github-actions[bot]"
-          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository_owner }}/Latvi-Coins-Private.git
-          git add lv_state_*.json
-          if ! git diff --staged --quiet; then
-            git commit -m "chore: 自动更新设备标识状态文件 [skip ci]"
-            git push
-            echo "✅ 状态文件已成功推送到私有仓库"
+          if ! git diff --quiet; then
+            git config user.email "actions@github.com"
+            git config user.name "GitHub Actions"
+            git add latvi_coins.py
+            git commit -m "🔄 自动更新 Cookie [skip ci]"
+            git push "https://${PRIVATE_REPO_TOKEN}@github.com/${{ github.repository_owner }}/Latvi-Coins-Private.git" HEAD
+            echo "✅ 推送成功"
           else
-            echo "ℹ️ 状态文件无变化，无需推送"
+            echo "ℹ️ 无需推送"
           fi
