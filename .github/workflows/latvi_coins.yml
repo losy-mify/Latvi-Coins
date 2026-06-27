@@ -62,7 +62,7 @@ jobs:
             git config user.email "actions@github.com"
             git config user.name "GitHub Actions"
             git add latvi_coins.py
-            git commit -m "🔄 自动更新 Cookie [skip ci]"
+            git commit -m "🔄 自动更新 [skip ci]"
             git push "https://${PRIVATE_REPO_TOKEN}@github.com/${{ github.repository_owner }}/Latvi-Coins-Private.git" HEAD
             echo "✅ 推送成功"
           else
