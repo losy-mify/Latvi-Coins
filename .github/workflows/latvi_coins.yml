@@ -2,10 +2,6 @@ name: Latvi-Coins
 
 on:
   workflow_dispatch:
-  repository_dispatch:
-    types: [cron-trigger]
-  schedule:
-    - cron: '0 0 * * *'  # 北京时间 08:00 (UTC+8)
     
 jobs:
   run_latvi_coins:
