@@ -61,7 +61,6 @@ jobs:
         env:
           PRIVATE_REPO_TOKEN: ${{ secrets.PRIVATE_REPO_TOKEN }}
         run: |
-          # 关键步骤：把更新了硬编码 Cookie 的脚本覆盖回 private 文件夹
           cp latvi_coins.py private/latvi_coins.py
           cd private
           if ! git diff --quiet; then
